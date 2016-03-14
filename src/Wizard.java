@@ -3,85 +3,104 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by lanev_000 on 7.03.2016.
+ * Created by lanev_000 on 10.03.2016.
  */
-public class Fighter extends Dude implements Effect{
+public class Wizard extends Dude implements Effect{
 
-    private int ActionPointsRecoverySpeed = 5;
+    private int ActionPointsRecoverySpeed = 8;
     private int recoveryLimit;
 
     public void setActionPointsRecoverySpeed(int actionPointsRecoverySpeed) {
         ActionPointsRecoverySpeed = actionPointsRecoverySpeed;
     }
 
-    public Fighter(int accuracy, int armor, int health, int actionPoints) {
+    public Wizard(int accuracy, int armor, int health, int actionPoints) {
         super(accuracy, armor, health, actionPoints);
         recoveryLimit = getActionPoints();
     }
 
-    private void armorBoost(){
-        int actionPrice = 15;
+    private void manaShield(){
+        int actionPrice = 25;
         if (getActionPoints() > actionPrice){
-            EffectParams armorBoost = new EffectParams("ArmorBoost", "Armor", "buff", 30, 3);
-            EffectParams accuracyDebuff = new EffectParams("AccuracyDebuff", "Accuracy", "buff", -15, 3);
-            implementEffect(armorBoost);
-            implementEffect(accuracyDebuff);
-            getEffects().add(armorBoost);
-            getEffects().add(accuracyDebuff);
+            EffectParams manaShield = new EffectParams("ManaShield", "Armor", "buff", 45, 2);
+            EffectParams actionPointsRecoverySpeedDebuff = new EffectParams("ActionPointsRecoverySpeedDebuff", "ActionPointsRecoverySpeed", "buff", -15, 2);
+            implementEffect(manaShield);
+            implementEffect(actionPointsRecoverySpeedDebuff);
+            getEffects().add(manaShield);
+            getEffects().add(actionPointsRecoverySpeedDebuff);
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
 
-    private void accuracyBuff(){
+    private void concentrationBuff(){
         int actionPrice = 15;
         if (getActionPoints() > actionPrice){
-            EffectParams accuracyBuff = new EffectParams("AccuracyBuff", "Accuracy", "buff", 20, 2);
-            EffectParams armorDebuff = new EffectParams("ArmorDebuff", "Armor", "buff", -15, 2);
-            implementEffect(accuracyBuff);
-            implementEffect(armorDebuff);
-            getEffects().add(accuracyBuff);
-            getEffects().add(armorDebuff);
+            EffectParams concentrationBuff = new EffectParams("ConcentrationBuff", "Accuracy", "buff", 15, 4);
+            implementEffect(concentrationBuff);
+            getEffects().add(concentrationBuff);
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
 
-    private void simpleAtack(Dude target){
+    private void manaBolt(Dude target){
         int actionPrice = 5;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("SimpleAtack", "Health", "permanent", -10, 1));
+            target.getEffects().add(new EffectParams("ManaBolt", "Health", "permanent", -5, 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
 
-    private void rageAtack(Dude target){
-        int actionPrice = 20;
+    private void manaInferno(Dude target){
+        int actionPrice = 40;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("RageAtack", "Health", "permanent", hitOrMiss(-30, target), 1));
+            target.getEffects().add(new EffectParams("ManaInferno", "Health", "permanent", hitOrMiss(-40, target), 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
 
-    private void sneakAtack(Dude target) {
+    private void soulDrain(Dude target) {
         int actionPrice = 20;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("SsneakAtack", "Health", "permanent", -5, 1));
-            target.getEffects().add(new EffectParams("Bleed", "Health", "permanent", -2, 5));
+            int manaAmount;
+            if (target.getActionPoints() >= 25){
+                manaAmount = 25;
+            }
+            else{
+                manaAmount = target.getActionPoints();
+            }
+            EffectParams soulDrain = new EffectParams("SoulDrain+", "ActionPoints", "permanent", manaAmount, 1);
+            implementEffect(soulDrain);
+            getEffects().add(soulDrain);
+            target.getEffects().add(new EffectParams("SoulDrain-", "ActionPoints", "permanent", -manaAmount, 1));
+            target.getEffects().add(new EffectParams("SoulLoss", "Health", "permanent", -2, 5));
             target.getEffects().add(new EffectParams("Weakening", "Armor", "buff", -20, 3));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
 
+    private void meditation(){
+        int actionPrice = 10;
+        if (getActionPoints() > actionPrice){
+            EffectParams meditation = new EffectParams("Meditation", "ActionPoints", "permanent", 50, 1);
+            implementEffect(meditation);
+            getEffects().add(meditation);
+            setActionPoints(getActionPoints()-actionPrice);
+        }
+    }
+
     private void actionRandomSelector(Dude target){
-        switch ((int)(Math.random()*5)) {
-            case 0: armorBoost();
-                    break;
-            case 1: accuracyBuff();
+        switch ((int)(Math.random()*6)) {
+            case 0: manaShield();
                 break;
-            case 2: simpleAtack(target);
+            case 1: concentrationBuff();
                 break;
-            case 3: rageAtack(target);
+            case 2: manaBolt(target);
                 break;
-            case 4: sneakAtack(target);
+            case 3: manaInferno(target);
+                break;
+            case 4: soulDrain(target);
+                break;
+            case 5: meditation();
                 break;
         }
     }

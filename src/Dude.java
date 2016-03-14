@@ -1,11 +1,15 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by lanev_000 on 7.03.2016.
  */
-abstract class Dude {
+abstract class Dude implements Effect{
     private int accuracy;
     private int armor;
     private int health;
     private int actionPoints;
+    private List<EffectParams> effects = new ArrayList<>();
 
     public Dude(int accuracy, int armor, int health, int actionPoints) {
         this.accuracy = accuracy;
@@ -15,6 +19,9 @@ abstract class Dude {
     }
 
     abstract void takeTurn(Dude target);
+    abstract void implementEffect(EffectParams effect);
+    abstract void implementEffects(List<EffectParams> effects);
+    abstract void debuff(List<EffectParams> effects);
 
     boolean isAlive(){
         if (health <= 0){
@@ -22,6 +29,15 @@ abstract class Dude {
         }
         else {
             return true;
+        }
+    }
+
+    public int hitOrMiss(int hitValue, Dude target){
+        if ((getAccuracy() + ((int)(Math.random()*20)+1)) >= target.getArmor()){
+            return hitValue;
+        }
+        else {
+            return 0;
         }
     }
 
@@ -41,6 +57,10 @@ abstract class Dude {
         return armor;
     }
 
+    public List<EffectParams> getEffects() {
+        return effects;
+    }
+
     public void setAccuracy(int accuracy) {
         this.accuracy = accuracy;
     }
@@ -55,5 +75,9 @@ abstract class Dude {
 
     public void setActionPoints(int actionPoints) {
         this.actionPoints = actionPoints;
+    }
+
+    public void setEffects(List<EffectParams> effects) {
+        this.effects = effects;
     }
 }
