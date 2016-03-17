@@ -14,20 +14,16 @@ public class Wizard extends Dude implements Effect{
         ActionPointsRecoverySpeed = actionPointsRecoverySpeed;
     }
 
-    public Wizard(int accuracy, int armor, int health, int actionPoints) {
-        super(accuracy, armor, health, actionPoints);
+    public Wizard(String name, int accuracy, int armor, int health, int actionPoints) {
+        super(name, accuracy, armor, health, actionPoints);
         recoveryLimit = getActionPoints();
     }
 
     private void manaShield(){
         int actionPrice = 25;
         if (getActionPoints() > actionPrice){
-            EffectParams manaShield = new EffectParams("ManaShield", "Armor", "buff", 45, 2);
-            EffectParams actionPointsRecoverySpeedDebuff = new EffectParams("ActionPointsRecoverySpeedDebuff", "ActionPointsRecoverySpeed", "buff", -15, 2);
-            implementEffect(manaShield);
-            implementEffect(actionPointsRecoverySpeedDebuff);
-            getEffects().add(manaShield);
-            getEffects().add(actionPointsRecoverySpeedDebuff);
+            setAction(new EffectParams("ManaShield", "Armor", "buff", 45, 2));
+            setAction(new EffectParams("ActionPointsRecoverySpeedDebuff", "ActionPointsRecoverySpeed", "buff", -15, 2));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -35,9 +31,7 @@ public class Wizard extends Dude implements Effect{
     private void concentrationBuff(){
         int actionPrice = 15;
         if (getActionPoints() > actionPrice){
-            EffectParams concentrationBuff = new EffectParams("ConcentrationBuff", "Accuracy", "buff", 15, 4);
-            implementEffect(concentrationBuff);
-            getEffects().add(concentrationBuff);
+            setAction(new EffectParams("ConcentrationBuff", "Accuracy", "buff", 15, 4));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -45,7 +39,7 @@ public class Wizard extends Dude implements Effect{
     private void manaBolt(Dude target){
         int actionPrice = 5;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("ManaBolt", "Health", "permanent", -5, 1));
+            target.setAction(new EffectParams("ManaBolt", "Health", "permanent", -5, 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -53,7 +47,7 @@ public class Wizard extends Dude implements Effect{
     private void manaInferno(Dude target){
         int actionPrice = 40;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("ManaInferno", "Health", "permanent", hitOrMiss(-40, target), 1));
+            target.setAction(new EffectParams("ManaInferno", "Health", "permanent", hitOrMiss(-40, target), 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -68,12 +62,10 @@ public class Wizard extends Dude implements Effect{
             else{
                 manaAmount = target.getActionPoints();
             }
-            EffectParams soulDrain = new EffectParams("SoulDrain+", "ActionPoints", "permanent", manaAmount, 1);
-            implementEffect(soulDrain);
-            getEffects().add(soulDrain);
-            target.getEffects().add(new EffectParams("SoulDrain-", "ActionPoints", "permanent", -manaAmount, 1));
-            target.getEffects().add(new EffectParams("SoulLoss", "Health", "permanent", -2, 5));
-            target.getEffects().add(new EffectParams("Weakening", "Armor", "buff", -20, 3));
+            setAction(new EffectParams("SoulDrain+", "ActionPoints", "permanent", manaAmount, 1));
+            target.setAction(new EffectParams("SoulDrain-", "ActionPoints", "permanent", -manaAmount, 1));
+            target.setAction(new EffectParams("SoulLoss", "Health", "permanent", -2, 5));
+            target.setAction(new EffectParams("Weakening", "Armor", "buff", -20, 3));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -81,9 +73,7 @@ public class Wizard extends Dude implements Effect{
     private void meditation(){
         int actionPrice = 10;
         if (getActionPoints() > actionPrice){
-            EffectParams meditation = new EffectParams("Meditation", "ActionPoints", "permanent", 50, 1);
-            implementEffect(meditation);
-            getEffects().add(meditation);
+            setAction(new EffectParams("Meditation", "ActionPoints", "permanent", 50, 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -107,8 +97,8 @@ public class Wizard extends Dude implements Effect{
 
     public void takeTurn(Dude target){
         implementEffects(getEffects());
-        actionRandomSelector(target);
         target.implementEffects(target.getEffects());
+        actionRandomSelector(target);
         target.debuff(target.getEffects());
         debuff(getEffects());
         if ((getActionPoints() + ActionPointsRecoverySpeed) < recoveryLimit){
@@ -170,6 +160,11 @@ public class Wizard extends Dude implements Effect{
                 }
             }
         }
+    }
+
+    public void setAction(EffectParams effect){
+        implementEffect(effect);
+        getEffects().add(effect);
     }
 
     //Ma ei saanud aru mida need meetodid tegema peavad ja seepärast neid ei kasuta.

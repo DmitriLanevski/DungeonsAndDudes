@@ -14,20 +14,16 @@ public class Rogue extends Dude implements Effect{
         ActionPointsRecoverySpeed = actionPointsRecoverySpeed;
     }
 
-    public Rogue(int accuracy, int armor, int health, int actionPoints) {
-        super(accuracy, armor, health, actionPoints);
+    public Rogue (String name, int accuracy, int armor, int health, int actionPoints) {
+        super(name, accuracy, armor, health, actionPoints);
         recoveryLimit = getActionPoints();
     }
 
     private void speedBoost(){
         int actionPrice = 7;
         if (getActionPoints() > actionPrice){
-            EffectParams speedBoost = new EffectParams("SpeedBoost", "Armor", "buff", 30, 3);
-            EffectParams accuracyDebuff = new EffectParams("AccuracyDebuff", "Accuracy", "buff", -10, 3);
-            implementEffect(speedBoost);
-            implementEffect(accuracyDebuff);
-            getEffects().add(speedBoost);
-            getEffects().add(accuracyDebuff);
+            setAction(new EffectParams("SpeedBoost", "Armor", "buff", 30, 3));
+            setAction(new EffectParams("AccuracyDebuff", "Accuracy", "buff", -10, 3));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -35,9 +31,7 @@ public class Rogue extends Dude implements Effect{
     private void eagleEye(){
         int actionPrice = 10;
         if (getActionPoints() > actionPrice){
-            EffectParams eagleEye = new EffectParams("EagleEye", "Accuracy", "buff", 40, 3);
-            implementEffect(eagleEye);
-            getEffects().add(eagleEye);
+            setAction(new EffectParams("EagleEye", "Accuracy", "buff", 40, 3));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -45,7 +39,7 @@ public class Rogue extends Dude implements Effect{
     private void simpleShot(Dude target){
         int actionPrice = 5;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("SimpleShot", "Health", "permanent", -10, 1));
+            target.setAction(new EffectParams("SimpleShot", "Health", "permanent", -10, 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -53,7 +47,7 @@ public class Rogue extends Dude implements Effect{
     private void NinjaStarShot(Dude target){
         int actionPrice = 30;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("NinjaStarShot", "Health", "permanent", hitOrMiss(-30, target), 1));
+            target.setAction(new EffectParams("NinjaStarShot", "Health", "permanent", hitOrMiss(-30, target), 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -61,9 +55,9 @@ public class Rogue extends Dude implements Effect{
     private void poisonousDagger(Dude target) {
         int actionPrice = 20;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("PoisonousDagger", "Health", "permanent", -10, 1));
-            target.getEffects().add(new EffectParams("Poisoned", "Health", "permanent", -4, 5));
-            target.getEffects().add(new EffectParams("Weakening", "Armor", "buff", -10, 3));
+            target.setAction(new EffectParams("PoisonousDagger", "Health", "permanent", -10, 1));
+            target.setAction(new EffectParams("Poisoned", "Health", "permanent", -4, 5));
+            target.setAction(new EffectParams("Weakening", "Armor", "buff", -10, 3));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -85,8 +79,8 @@ public class Rogue extends Dude implements Effect{
 
     public void takeTurn(Dude target){
         implementEffects(getEffects());
-        actionRandomSelector(target);
         target.implementEffects(target.getEffects());
+        actionRandomSelector(target);
         target.debuff(target.getEffects());
         debuff(getEffects());
         if ((getActionPoints() + ActionPointsRecoverySpeed) < recoveryLimit){
@@ -148,6 +142,11 @@ public class Rogue extends Dude implements Effect{
                 }
             }
         }
+    }
+
+    public void setAction(EffectParams effect){
+        implementEffect(effect);
+        getEffects().add(effect);
     }
 
     //Ma ei saanud aru mida need meetodid tegema peavad ja seepärast neid ei kasuta.

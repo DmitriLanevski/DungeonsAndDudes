@@ -14,20 +14,16 @@ public class Fighter extends Dude implements Effect{
         ActionPointsRecoverySpeed = actionPointsRecoverySpeed;
     }
 
-    public Fighter(int accuracy, int armor, int health, int actionPoints) {
-        super(accuracy, armor, health, actionPoints);
+    public Fighter(String name, int accuracy, int armor, int health, int actionPoints) {
+        super(name, accuracy, armor, health, actionPoints);
         recoveryLimit = getActionPoints();
     }
 
     private void armorBoost(){
         int actionPrice = 15;
         if (getActionPoints() > actionPrice){
-            EffectParams armorBoost = new EffectParams("ArmorBoost", "Armor", "buff", 30, 3);
-            EffectParams accuracyDebuff = new EffectParams("AccuracyDebuff", "Accuracy", "buff", -15, 3);
-            implementEffect(armorBoost);
-            implementEffect(accuracyDebuff);
-            getEffects().add(armorBoost);
-            getEffects().add(accuracyDebuff);
+            setAction(new EffectParams("ArmorBoost", "Armor", "buff", 30, 3));
+            setAction(new EffectParams("AccuracyDebuff", "Accuracy", "buff", -15, 3));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -35,12 +31,8 @@ public class Fighter extends Dude implements Effect{
     private void accuracyBuff(){
         int actionPrice = 15;
         if (getActionPoints() > actionPrice){
-            EffectParams accuracyBuff = new EffectParams("AccuracyBuff", "Accuracy", "buff", 20, 2);
-            EffectParams armorDebuff = new EffectParams("ArmorDebuff", "Armor", "buff", -15, 2);
-            implementEffect(accuracyBuff);
-            implementEffect(armorDebuff);
-            getEffects().add(accuracyBuff);
-            getEffects().add(armorDebuff);
+            setAction(new EffectParams("AccuracyBuff", "Accuracy", "buff", 20, 2));
+            setAction(new EffectParams("ArmorDebuff", "Armor", "buff", -15, 2));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -48,7 +40,7 @@ public class Fighter extends Dude implements Effect{
     private void simpleAtack(Dude target){
         int actionPrice = 5;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("SimpleAtack", "Health", "permanent", -10, 1));
+            target.setAction(new EffectParams("SimpleAtack", "Health", "permanent", -10, 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -56,7 +48,7 @@ public class Fighter extends Dude implements Effect{
     private void rageAtack(Dude target){
         int actionPrice = 20;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("RageAtack", "Health", "permanent", hitOrMiss(-30, target), 1));
+            target.setAction(new EffectParams("RageAtack", "Health", "permanent", hitOrMiss(-30, target), 1));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -64,9 +56,9 @@ public class Fighter extends Dude implements Effect{
     private void sneakAtack(Dude target) {
         int actionPrice = 20;
         if (getActionPoints() > actionPrice){
-            target.getEffects().add(new EffectParams("SsneakAtack", "Health", "permanent", -5, 1));
-            target.getEffects().add(new EffectParams("Bleed", "Health", "permanent", -2, 5));
-            target.getEffects().add(new EffectParams("Weakening", "Armor", "buff", -20, 3));
+            target.setAction(new EffectParams("SsneakAtack", "Health", "permanent", -5, 1));
+            target.setAction(new EffectParams("Bleed", "Health", "permanent", -2, 5));
+            target.setAction(new EffectParams("Weakening", "Armor", "buff", -20, 3));
             setActionPoints(getActionPoints()-actionPrice);
         }
     }
@@ -88,8 +80,8 @@ public class Fighter extends Dude implements Effect{
 
     public void takeTurn(Dude target){
         implementEffects(getEffects());
-        actionRandomSelector(target);
         target.implementEffects(target.getEffects());
+        actionRandomSelector(target);
         target.debuff(target.getEffects());
         debuff(getEffects());
         if ((getActionPoints() + ActionPointsRecoverySpeed) < recoveryLimit){
@@ -151,6 +143,11 @@ public class Fighter extends Dude implements Effect{
                 }
             }
         }
+    }
+
+    public void setAction(EffectParams effect){
+        implementEffect(effect);
+        getEffects().add(effect);
     }
 
     //Ma ei saanud aru mida need meetodid tegema peavad ja seepärast neid ei kasuta.
